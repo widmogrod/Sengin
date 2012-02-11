@@ -22,7 +22,7 @@ namespace Sengin
     $extractor = new Extractor\GoogleSearch($source);
     $extraction = $extractor->extract();
 
-    $searchResults = $extraction->getSearchResults();
+    $searchResults = $extraction->getSponsoredResult();
     $it = new \ArrayIterator($searchResults);
 
     while($it->valid())

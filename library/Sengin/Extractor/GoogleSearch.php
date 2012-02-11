@@ -58,7 +58,9 @@ class GoogleSearch implements Extractor
         $xpath = new \DOMXPath($document);
 
         $elements = $xpath->query(
-            "//li//h3//a[contains(normalize-space(@id), 'pa')]"
+            "//li[contains(normalize-space(@class), 'g')]".
+            "//h3[contains(normalize-space(@class), 'r')]".
+            "//a"
         );
 
         if (!count($elements)) {
@@ -86,14 +88,14 @@ class GoogleSearch implements Extractor
         $extraction->setSearchResults($results);
     }
 
-    protected function extractSponsorerdResults(\Sengin\Extraction $extraction)
+    protected function extractSponsoredResults(\Sengin\Extraction $extraction)
     {
         $document = $this->getDocument();
         $xpath = new \DOMXPath($document);
 
         $elements = $xpath->query(
-            "//li[contains(normalize-space(@class), 'g')]".
-            "//h3[contains(normalize-space(@class), 'r')]".
+            "//li[starts-with(normalize-space(@class), 'ta')]".
+            "//h3[not(contains(normalize-space(@class), 'r'))]".
             "//a"
         );
 
@@ -107,6 +109,10 @@ class GoogleSearch implements Extractor
         foreach($elements as $key => /* @var $element \DOMElement */ $element)
         {
             $url = $element->getAttribute('href');
+            $query = parse_url($url, PHP_URL_QUERY);
+            parse_str($query, $queryArray);
+            $url = isset($queryArray['c']) ? $queryArray['c'] : $queryArray['adurl'];
+
             $title = $element->textContent;
             $title = $this->filterWhitespaces($title);
 
@@ -114,7 +120,6 @@ class GoogleSearch implements Extractor
             $result->setUrl($url);
             $result->setTitle($title);
             $result->setPosition(++$position);
-
             $results->append($result);
         }
 
