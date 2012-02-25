@@ -1,5 +1,5 @@
 <?php
 
-namespace Sengin\Extractor;
+namespace Sengin\Extractor\Exception;
 
 class Exception extends \Exception {}

@@ -38,10 +38,8 @@ namespace
 
 namespace Sengin
 {
-    $file = 'resources/googlesearch.html';
-
     $definition = new Definition\GoogleSearch();
-    $definition->setQuery('Kontakt Agencja Reklamowa Kraków');
+    $definition->setQuery('Adres email Agencja Reklamowa Kraków');
     $definition->setOnPage(99);
 
     $source = new DataSource\Url($definition);

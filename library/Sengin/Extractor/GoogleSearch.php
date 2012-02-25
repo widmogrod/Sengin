@@ -19,6 +19,12 @@ class GoogleSearch implements Extractor
      */
     protected $_dataSource;
 
+    /**
+     * Disable libxml errors and allow user to fetch error information as needed
+     * @var bool
+     */
+    protected $_disableLibXmlErrors = true;
+
     public function __construct(DataSource $dataSource)
     {
         $this->_dataSource = $dataSource;
@@ -35,15 +41,41 @@ class GoogleSearch implements Extractor
         return $this->_document;
     }
 
+    /**
+     * @param boolean $disableLibXmlErrors
+     */
+    public function setDisableLibXmlErrors($disableLibXmlErrors)
+    {
+        $this->_disableLibXmlErrors = (bool) $disableLibXmlErrors;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getDisableLibXmlErrors()
+    {
+        return $this->_disableLibXmlErrors;
+    }
+
     public function extract()
     {
         $data = $this->_dataSource->getData();
         $document = $this->getDocument();
-        if (!$document->loadHTML($data))
+
+        $previos = libxml_use_internal_errors($this->getDisableLibXmlErrors());
+        $isLoaded = $document->loadHTML($data);
+        libxml_use_internal_errors($previos);
+
+        if (!$isLoaded)
         {
             $message = "Can't load html data from given source";
-            throw new Exception($message);
+            throw new Exception\Exception($message);
         }
+
+        /*
+         * if html loaded successful, clear some warnings ie.
+         * Warning: DOMDocument::loadHTML(): htmlParseEntityRef: expecting ';' in Entity
+         */
 
         $result = new Result();
         $this->extractSearchResults($result);
