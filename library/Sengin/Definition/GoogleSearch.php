@@ -22,7 +22,7 @@ class GoogleSearch implements Definition
         if (empty($this->_query) && $this->_query != 0)
         {
             $message = 'Search query have to be set';
-            throw new Exception($message);
+            throw new Exception\InvalidArgumentException($message);
         }
         return $this->_query;
     }
@@ -43,7 +43,7 @@ class GoogleSearch implements Definition
         {
             $message = 'On page should be bettwen 10 and 100. Given value is %s';
             $message = sprintf($message, $onPage);
-            throw new Exception($message);
+            throw new Exception\InvalidArgumentException($message);
         }
 
         $this->_onPage = $onPage;
