@@ -32,7 +32,7 @@ class GoogleSearch implements Definition
         return sprintf(
             'http://%s/search?hl=pl&q=%s&num=%d',
             $this->getDomain(),
-            $this->getQuery(),
+            urlencode($this->getQuery()),
             $this->getOnPage()
         );
     }

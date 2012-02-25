@@ -2,7 +2,7 @@
 
 namespace Sengin\DataSource;
 
-use Sengin\DataSource AS DataSourceInterface;
+use Sengin\DataSource as DataSourceInterface;
 use Sengin\DataSource\Options\Cache as CacheOptions;
 
 class Cache implements DataSourceInterface
@@ -52,7 +52,7 @@ class Cache implements DataSourceInterface
         {
             $expirationTime = $this->_options->getExpirationTime();
             $lastModificationTime = time() - filemtime($cacheFile);
-            if ($lastModificationTime < $expirationTime) {
+            if ($lastModificationTime <= $expirationTime) {
                 // from cache
                 return file_get_contents($cacheFile);
             }
