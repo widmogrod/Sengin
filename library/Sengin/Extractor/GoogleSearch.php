@@ -57,11 +57,19 @@ class GoogleSearch implements Extractor
         return $this->_disableLibXmlErrors;
     }
 
+    /**
+     * @return \Sengin\Extraction\Result
+     * @throws Exception\Exception
+     */
     public function extract()
     {
         $data = $this->_dataSource->getData();
         $document = $this->getDocument();
 
+        /*
+        * If disable libxml errors is set to true then we see no more errors like that:
+        * Warning: DOMDocument::loadHTML(): htmlParseEntityRef: expecting ';' in Entity
+        */
         $previos = libxml_use_internal_errors($this->getDisableLibXmlErrors());
         $isLoaded = $document->loadHTML($data);
         libxml_use_internal_errors($previos);
@@ -71,11 +79,6 @@ class GoogleSearch implements Extractor
             $message = "Can't load html data from given source";
             throw new Exception\Exception($message);
         }
-
-        /*
-         * if html loaded successful, clear some warnings ie.
-         * Warning: DOMDocument::loadHTML(): htmlParseEntityRef: expecting ';' in Entity
-         */
 
         $result = new Result();
         $this->extractSearchResults($result);
