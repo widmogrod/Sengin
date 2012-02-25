@@ -3,7 +3,7 @@
 namespace Sengin\DataSource;
 
 use Sengin\DataSource;
-use Sengin\DataSource\Exception;
+use Sengin\DataSource\Exception\InvalidArgumentException;
 
 class File implements DataSource
 {
@@ -13,16 +13,16 @@ class File implements DataSource
     {
         if (!is_file($file))
         {
-            $message = 'File "%s" don\'t exists';
+            $message = 'File "%s" dosen\'t exists';
             $message = sprintf($message, $file);
-            throw new Exception($message);
+            throw new InvalidArgumentException($message);
         }
 
         if (!is_readable($file))
         {
             $message = 'File "%s" isn\'t readable';
             $message = sprintf($message, $file);
-            throw new Exception($message);
+            throw new InvalidArgumentException($message);
         }
 
         $this->_file = $file;

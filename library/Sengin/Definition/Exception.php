@@ -1,5 +1,6 @@
 <?php
 
-namespace Sengin\DataSource;
+
+namespace Sengin\Definition;
 
 class Exception extends \Exception {}
