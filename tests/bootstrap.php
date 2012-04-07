@@ -10,3 +10,5 @@ set_include_path(implode(';', array(
 spl_autoload_register(function($className){
     require_once str_replace('\\','/', $className) . '.php';
 });
+
+date_default_timezone_set('Europe/Warsaw');

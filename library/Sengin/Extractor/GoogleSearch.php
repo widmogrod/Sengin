@@ -108,7 +108,11 @@ class GoogleSearch implements Extractor
         foreach($elements as $key => /* @var $element \DOMElement */ $element)
         {
             $url = $element->getAttribute('href');
-            parse_url($url);
+
+            $query = parse_url($url, PHP_URL_QUERY);
+            parse_str($query, $queryArray);
+            $url = isset($queryArray['q']) ? $queryArray['q'] : $url;
+
             $title = $element->textContent;
             $title = $this->filterWhitespaces($title);
 
