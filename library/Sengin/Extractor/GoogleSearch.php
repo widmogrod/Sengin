@@ -6,6 +6,7 @@ use Sengin\Extractor;
 use Sengin\DataSource;
 use Sengin\Extraction\Result;
 use Sengin\Extraction\SearchResult;
+use Sengin\Extraction\SuggestedKeyword;
 
 class GoogleSearch implements Extractor
 {
@@ -83,6 +84,7 @@ class GoogleSearch implements Extractor
         $result = new Result();
         $this->extractSearchResults($result);
         $this->extractSponsoredResults($result);
+        $this->extractSuggstions($result);
 
         return $result;
     }
@@ -133,9 +135,9 @@ class GoogleSearch implements Extractor
         $xpath = new \DOMXPath($document);
 
         $elements = $xpath->query(
-            "//li[starts-with(normalize-space(@class), 'ta')]".
-            "//h3[not(contains(normalize-space(@class), 'r'))]".
-            "//a"
+            "//li".
+            "//h3".
+            "//a[starts-with(normalize-space(@href), '/aclk?sa=')]"
         );
 
         if (!count($elements)) {
@@ -163,6 +165,38 @@ class GoogleSearch implements Extractor
         }
 
         $extraction->setSponsoredResult($results);
+    }
+
+    protected function extractSuggstions(\Sengin\Extraction $extraction)
+    {
+        $document = $this->getDocument();
+        $xpath = new \DOMXPath($document);
+
+        /**
+         * ct = broad-revision: (? ct = click through) Where was the link? Depending on the search result can “ct = title” or as “ct = Resalte” occur.
+         * http://www.googlesearchblog.com/seo-universal-search.html
+         */
+        $elements = $xpath->query(
+            "//p//a[contains(normalize-space(@href), 'ct=broad-revision')]"
+        );
+
+        if (!count($elements)) {
+            return false;
+        }
+
+        $results = new \ArrayObject();
+
+        foreach($elements as /* @var $element \DOMElement */ $element)
+        {
+            $keyword = $element->textContent;
+            $keyword = $this->filterWhitespaces($keyword);
+
+            $result = new SuggestedKeyword();
+            $result->setKeyword($keyword);
+            $results->append($result);
+        }
+
+        $extraction->setSuggestedKeywords($results);
     }
 
     protected function filterWhitespaces($string)

@@ -74,32 +74,28 @@ namespace
 namespace Sengin
 {
     $definition = new Definition\GoogleSearch();
-    $definition->setQuery('Agencja Reklamowa Kraków -katalog -drukarnia + kontakt');
-    $definition->setOnPage(99);
+    $definition->setQuery('tłumacz języka angielskiego darmowy');
+    $definition->setOnPage(10);
 
     $source = new DataSource\Url($definition);
-
+//    echo $source->getCacheKey();
     $cacheOptions = new DataSource\Options\Cache();
     $cacheOptions->setCacheDir(__DIR__ . '/cache');
     $source = new DataSource\Cache($source, $cacheOptions);
 
+
     $extractor = new Extractor\GoogleSearch($source);
     $extraction = $extractor->extract();
 
-    $searchResults = $extraction->getSearchResults();
+    $searchResults = $extraction->getSuggestedKeywords();
     $it = new \ArrayIterator($searchResults);
 
     while($it->valid())
     {
-        /** @var $result \Sengin\Extraction\SearchResult */
+        /** @var $result \Sengin\Extraction\SuggestedSearch */
         $result = $it->current();
 
-        echo sprintf(
-            'pos:%s, url:%s, title: %s'."\n",
-            $result->getPosition(),
-            str_pad($result->getUrl(), 200),
-            $result->getTitle()
-        );
+        echo $result->getKeyword() . "\n";
 
         $it->next();
     }

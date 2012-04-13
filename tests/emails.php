@@ -10,8 +10,10 @@ namespace Sengin
     $miasta = file($miasta);
     $miasta = array_map('trim', $miasta);
     $miasta = array_filter($miasta);
+    
+    //$miasta = array_slice($miasta, 328*2);
 
-//    $miasta = array('Krakow');
+    $miasta = array('Żywiec');
     $baseKeyword = 'pozycjonowanie ';
 
     $emailFileStorage = sprintf('%s/email-%s-%s.csv', __DIR__, date('Ymd-His'), $baseKeyword);
@@ -21,10 +23,10 @@ namespace Sengin
     $cacheOptions = new DataSource\Options\Cache();
     $cacheOptions->setCacheDir(__DIR__ . '/cache');
 
-    register_shutdown_function(function() {
-        global $handle;
-        fclose($handle);
-    });
+//    register_shutdown_function(function() {
+//        global $handle;
+//        fclose($handle);
+//    });
 
     foreach ($miasta as $i => $miasto)
     {
@@ -40,7 +42,12 @@ namespace Sengin
         $source = new DataSource\Cache($source, $cacheOptions);
 
         $extractor = new Extractor\GoogleSearch($source);
-        $extraction = $extractor->extract();
+        try {
+            $extraction = $extractor->extract();
+        } catch (\Exception $e) {
+            echo $e->getMessage() . ' '. $result->getUrl() . "\n";
+            goto save;
+        }
 
         $searchResults = $extraction->getSearchResults();
         $it = new \ArrayIterator($searchResults);
@@ -52,7 +59,7 @@ namespace Sengin
             $result = $it->current();
 
             $source = new DataSource\Url($result->getUrl());
-            $source->setTimeout(10);
+            $source->setTimeout(5);
             $source = new DataSource\Cache($source, $cacheOptions);
 
             try {
@@ -64,6 +71,7 @@ namespace Sengin
 
             // in case when email adres is encoded by character entities
             $content = html_entity_decode($content);
+            $content = strip_tags($content);
 
             preg_match_all(
                 '#(\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b)#i',
@@ -96,6 +104,9 @@ namespace Sengin
                         case false !== stripos($value, '/picture'): $result = false; break;
                         case false !== stripos($value, 'acebook.com/js/'): $result = false; break;
                         case false !== stripos($value, 'facebook/assets/'): $result = false; break;
+                        case false !== stripos($value, 'status/url'): $result = false; break;
+                        case false !== stripos($value, 'facebook.pl'): $result = false; break;
+
                     }
 
                     return $result;
@@ -129,6 +140,8 @@ namespace Sengin
 
             $it->next();
         }
+
+        save:
 
         foreach ($data as $info)
         {

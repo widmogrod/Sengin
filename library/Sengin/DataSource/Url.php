@@ -51,7 +51,7 @@ class Url implements DataSource, Cachable
 
         if(strtolower(parse_url($this->getUrl(), PHP_URL_SCHEME)) == 'https')
         {
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 1);
         }
         else
