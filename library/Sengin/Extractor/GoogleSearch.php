@@ -97,7 +97,7 @@ class GoogleSearch implements Extractor
         $elements = $xpath->query(
             "//li[contains(normalize-space(@class), 'g')]".
             "//h3[contains(normalize-space(@class), 'r')]".
-            "//a"
+            "//a[starts-with(normalize-space(@href), '/url?q=')]"
         );
 
         if (!count($elements)) {
